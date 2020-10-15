@@ -1,0 +1,25 @@
+drop table agenda;
+create table agenda(horario time);
+
+create or replace function cria_agenda(inicio time, termino time, intervalo time) returns void as 
+$$
+	declare 
+		horario time;
+	begin
+		horario := inicio;
+		while horario <= termino loop 
+			if (horario > '12:00:00' and horario < '14:00:00') then
+				horario := '14:00:00'; 	
+			end if;
+			insert into agenda values(horario);
+			select horario::interval + intervalo::interval into horario;
+		end loop;
+	end
+$$
+language plpgsql;
+
+-- testando
+select cria_agenda('08:00:00', '18:00:00', '00:30:00');
+
+select * from agenda;
+
